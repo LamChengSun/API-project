@@ -2,6 +2,7 @@ from django.shortcuts import render
 import folium
 import pandas as pd
 from folium import GeoJson
+import json
 
 # Create your views here.
 
@@ -35,6 +36,7 @@ def index(request):
         date_range.remove('station')
         date_range.remove('lat')
         date_range.remove('lng')
+        date_range = json.dumps(date_range)
 
         # add the marker to the map
         folium.Marker(location=[lat, lng],tooltip= station,icon=folium.DivIcon(html=value,icon_size=(30,30))).add_to(m)
