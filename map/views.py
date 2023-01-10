@@ -28,6 +28,13 @@ def index(request):
         lng = df.at[i,'lng']
         station = df.at[i,'station']
         value = str(df.at[i,'Jan-21'])
+        
+        date_range = list(df.columns.values)
+        date_range.remove('ID')
+        date_range.remove('state')
+        date_range.remove('station')
+        date_range.remove('lat')
+        date_range.remove('lng')
 
         # add the marker to the map
         folium.Marker(location=[lat, lng],tooltip= station,icon=folium.DivIcon(html=value,icon_size=(30,30))).add_to(m)
@@ -41,6 +48,7 @@ def index(request):
     context = {
         'm': m,
         'groups': groups,
+        'data_range': date_range,
     }
 
     return render(request,'index.html',context)
