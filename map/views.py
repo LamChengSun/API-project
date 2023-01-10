@@ -22,26 +22,42 @@ def index(request):
     GeoJson(text).add_to(m)
 
 
-    # Display all of the state
+    # DLoad the csv file
     df = pd.read_csv("map/csvfiles/apims_final_id.csv")
+
+
+    date_range = 'Jan-21'
+    
+    if request.method == "POST":
+        date_range = request.POST.get("date_range")
+    
+    color_values = {
+        'blue': range(0, 51),
+        'green': range(51, 101),
+        'yellow': range(101, 201),
+        'red': range(201, 301),
+        'darkred': range(301, 9999999)
+    }
+
     for i, row in df.iterrows():
         lat = df.at[i,'lat']
         lng = df.at[i,'lng']
         station = df.at[i,'station']
-        value = str(df.at[i,'Jan-21'])
-        
-        date_range = list(df.columns.values)
-        date_range.remove('ID')
-        date_range.remove('state')
-        date_range.remove('station')
-        date_range.remove('lat')
-        date_range.remove('lng')
-        date_range = json.dumps(date_range)
+        value = df.at[i,date_range]
+        print(value)
 
-        # add the marker to the map
-        folium.Marker(location=[lat, lng],tooltip= station,icon=folium.DivIcon(html=value,icon_size=(30,30))).add_to(m)
+        color = 'blue'
+        for key, value_range in color_values.items():
+            if value in value_range:
+                color = key
+                break
+        html = f'<div style="background-color:{color}; width: 30px; height: 30px; border-radius: 15px; display: flex; align-items: center; justify-content: center;">{value}</div>'
+        icon = folium.DivIcon(html=html)
+        folium.Marker(location=[lat, lng],tooltip= station,icon=icon).add_to(m)   
+        
     folium.LayerControl().add_to(m)
-    
+
+
     #Get html representation of map
     m = m._repr_html_()
 
@@ -51,6 +67,7 @@ def index(request):
         'm': m,
         'groups': groups,
         'data_range': date_range,
+               
     }
 
     return render(request,'index.html',context)
