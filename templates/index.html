@@ -1,0 +1,57 @@
+{% extends 'partials/base.html' %}
+{% block title %} Home Page{% endblock %}
+{% block content %}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+
+<div class="map-container">
+    <div class="row">
+        <div class="col-md-8" style="max-width:1000px;padding-top:20px;margin:auto;">
+            {{ m | safe }}
+        </div>
+        <div class="col-md-4">
+            <div id="timeline" style="height: 400px;"></div>
+        </div>
+    </div>
+    <div class= "col-md-10" style="padding-top:10px;margin:auto;">
+        {% for name, group in groups %}
+        <a href="{% url 'submap' name %}"><button>{{ name }}</button></a>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    var timeline = $("#timeline").slider({
+        range: true,
+        min: 0,
+        max: 12,
+        step: 1,
+        values: [0, 12],
+        slide: function(event, ui) {
+            updateMarkers(ui.values);
+        }
+    });
+    
+    function updateMarkers(values) {
+        for (var i = 0; i < data.length; i++) {
+            // Remove the existing marker from the map
+            map.removeLayer(markers[i]);
+    
+            // Get the value for the selected time range
+            var value = data[i]["Jan-21"];
+            var vl = 0;
+            for (j = values[0]; j <= values[1]; j++) {
+                vl += data[i][months[j]];
+            }
+            vl = vl / (values[1] - values[0] + 1);
+            vl = Math.round(vl);
+    
+            // Create a new marker with the updated value
+            var marker = L.marker([data[i]["lat"], data[i]["lng"]]).addTo(map);
+            markers[i] = marker;
+            marker.bindPopup(vl);
+        }
+    }
+</script>
+{% endblock %}
