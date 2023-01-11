@@ -2,7 +2,7 @@ from django.shortcuts import render
 import folium
 import pandas as pd
 from folium import GeoJson
-import json
+
 
 # Create your views here.
 
@@ -22,21 +22,22 @@ def index(request):
     GeoJson(text).add_to(m)
 
 
-    # DLoad the csv file
+    # Get the csv file
     df = pd.read_csv("map/csvfiles/apims_final_id.csv")
 
 
-    date_range = 'Jan-21'
+    date_range = '2021-12'
     
     if request.method == "POST":
         date_range = request.POST.get("date_range")
+       
     
     color_values = {
-        'blue': range(0, 51),
-        'green': range(51, 101),
+        'cornflowerblue': range(0, 51),
+        'limegreen': range(51, 101),
         'yellow': range(101, 201),
-        'red': range(201, 301),
-        'darkred': range(301, 9999999)
+        'orange': range(201, 301),
+        'red': range(301, 9999999)
     }
 
     for i, row in df.iterrows():
@@ -44,7 +45,7 @@ def index(request):
         lng = df.at[i,'lng']
         station = df.at[i,'station']
         value = df.at[i,date_range]
-        print(value)
+        
 
         color = 'blue'
         for key, value_range in color_values.items():
@@ -61,11 +62,8 @@ def index(request):
     #Get html representation of map
     m = m._repr_html_()
 
-    groups = df.groupby('state')
-
     context = {
         'm': m,
-        'groups': groups,
         'data_range': date_range,
                
     }
@@ -74,27 +72,100 @@ def index(request):
 
 
 
-#Submap function
-def submap(request,name):
+#Comparison - real time vs historical
+def compare(request):
+    #Create map
+    m1 = folium.Map(location=[4.64865,101.10757], zoom_start=6)
+    m2 = folium.Map(location=[4.64865,101.10757], zoom_start=6)
+
+    folium.raster_layers.TileLayer('Stamen Terrain').add_to(m1)
+    folium.raster_layers.TileLayer('Stamen Toner').add_to(m1)
+    folium.raster_layers.TileLayer('Stamen Watercolor').add_to(m1)
+    folium.raster_layers.TileLayer('CartoDB Positron').add_to(m1)
+    folium.raster_layers.TileLayer('CartoDB Dark_Matter').add_to(m1)
+
+    folium.raster_layers.TileLayer('Stamen Terrain').add_to(m2)
+    folium.raster_layers.TileLayer('Stamen Toner').add_to(m2)
+    folium.raster_layers.TileLayer('Stamen Watercolor').add_to(m2)
+    folium.raster_layers.TileLayer('CartoDB Positron').add_to(m2)
+    folium.raster_layers.TileLayer('CartoDB Dark_Matter').add_to(m2)
+
+    geo=r"map/csvfiles/malaysia.geojson"
+    file = open(geo, encoding="utf8")
+    text = file.read()
+    GeoJson(text).add_to(m1)
+
+    geo=r"map/csvfiles/malaysia.geojson"
+    file = open(geo, encoding="utf8")
+    text = file.read()
+    GeoJson(text).add_to(m2)
+
+
+    # Get the csv file
     df = pd.read_csv("map/csvfiles/apims_final_id.csv")
-    df = df.transpose()
-    group = df[df['state'] == name]
-    station_names = group['station'].tolist()
-    month_rows = df.iloc[2:]  # Extract rows after the first two rows
-    values = df.iloc[:2]  # Extract the first two rows
 
-    month_rows = month_rows.values.tolist()
-    values = values.values.tolist()
+    date_range1 = '2019-12'
+    date_range2 = '2021-12'
+    
+    if request.method == "POST":
+        if 'submit_map1' in request.POST:
+            date_range1 = request.POST.get("date_range1")
+        elif 'submit_map2' in request.POST:
+            date_range2 = request.POST.get("date_range2")
 
-    for index, row in group.iterrows():
-        station_name = row['station']
-        month_rows[station_name] = row[2:]
+    
+    color_values = {
+        'cornflowerblue': range(0, 51),
+        'limegreen': range(51, 101),
+        'yellow': range(101, 201),
+        'orange': range(201, 301),
+        'red': range(301, 9999999)
+    }
+
+    for i, row in df.iterrows():
+        lat = df.at[i,'lat']
+        lng = df.at[i,'lng']
+        station = df.at[i,'station']
+        value1 = df.at[i,date_range1]
+        
+        color = 'blue'
+        for key, value_range in color_values.items():
+            if value1 in value_range:
+                color = key
+                break
+        html1 = f'<div style="background-color:{color}; width: 30px; height: 30px; border-radius: 15px; display: flex; align-items: center; justify-content: center;">{value1}</div>'
+        icon1 = folium.DivIcon(html=html1)
+        folium.Marker(location=[lat, lng],tooltip= station,icon=icon1).add_to(m1)   
+        
+    folium.LayerControl().add_to(m1)
+
+
+    for i, row in df.iterrows():
+        lat = df.at[i,'lat']
+        lng = df.at[i,'lng']
+        station = df.at[i,'station']
+        value2 = df.at[i,date_range2]
+        
+
+        color = 'blue'
+        for key, value_range in color_values.items():
+            if value2 in value_range:
+                color = key
+                break
+        html2 = f'<div style="background-color:{color}; width: 30px; height: 30px; border-radius: 15px; display: flex; align-items: center; justify-content: center;">{value2}</div>'
+        icon2 = folium.DivIcon(html=html2)
+        folium.Marker(location=[lat, lng],tooltip= station,icon=icon2).add_to(m2)
+    folium.LayerControl().add_to(m2)
+
+    #Get html representation of map
+    m1 = m1._repr_html_()
+    m2 = m2._repr_html_()
 
     context = {
-        'group': group,
-        'name' : name,
-        'station_names': station_names,
-        'month_rows': month_rows, 
-        'values': values,
+        'm1':m1,
+        'm2': m2,
+        'data_range1': date_range1,
+        'data_range2': date_range2,
+               
     }
-    return render(request, 'submap.html', context)
+    return render(request,'compare.html',context)
