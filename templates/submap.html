@@ -1,0 +1,35 @@
+{% extends 'partials/base.html' %}
+{% block title %}Maps for Comparison{% endblock %}
+{% block content %}
+
+
+<div class="list-group" style="padding: 2rem;">
+    {% if locations %}
+    {% for location in locations %}
+    <button type="button" class="list-group-item list-group-item-action" onclick="showGraph('{{location.location}}')" style="display: flex; align-items: center; justify-content: space-between;">{{location.location}} <div style="display: flex;">Current<div style='height: 20px; width: 40px; margin-left: 10px; background: {{ location.color }}'></div></div></button>
+    {% endfor %}
+    {% else %}
+    <p>No station found</p>
+    {% endif %}
+
+    {% if station %}
+    <br>
+    <br>
+    <br>
+        <div style="display: flex; align-items: center; justify-content: center; flex-direction: row;">
+
+            <div style="display: flex; align-items: center; flex-direction: column; justify-content: center;">
+                <h1>* Current</h1>
+                <img src="{% url 'show_bar_graph' %}" width="808" height="780" alt="Bar Graph">
+            </div>
+            
+            <div style="display: flex; align-items: center; flex-direction: column; justify-content: center;">
+                <h1>* Historical</h1>
+                <img src="{% url 'show_historical_bar_graph' %}" width="808" height="780" alt="Bar Graph">
+            </div>
+            
+        </div>
+    {% endif %}
+</div>
+        
+{% endblock %}
