@@ -1,20 +1,17 @@
 <!--navbar-->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <a class="navbar-brand" style="border-right-style: solid;color:white;padding-right:30px;padidng-left:20px;" href="{% url 'index' %}">Maps On Historical Air Pollutant Index</a>
+    <a class="navbar-brand" style="border-right-style: solid;color:white;padding-right:30px;padding-left:20px;" href="{% url 'index' %}">Maps On Historical Air Pollutant Index</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
         aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto mb-2 mb-md-0">
             <li class="nav-item">
-                <a class="nav-link active" style="border-right-style: solid;color:white;padding-right:30px"  aria-current="page" href="{% url 'index' %}">Home</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link active" style="border-right-style: solid;color:white;padding-right:20px;padding-left:20px"  href="#">Submap</a>
+                <a class="nav-link active" style="border-right-style: solid;color:white;padding-right:30px"  href="{% url 'compare' %}">Comparison</a>
               </li>
         </ul>
-    </div>
+    </div> 
 </nav>
 <!--end navbar-->

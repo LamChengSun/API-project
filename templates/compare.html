@@ -1,0 +1,79 @@
+{% extends 'partials/base.html' %}
+{% block title %} Comparison Page{% endblock %}
+{% block content %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.6.0/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin=""/>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.6.0/leaflet.js" integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew==" crossorigin=""></script>
+
+<div class="container mt-5 pt-5">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="current-date-range1" style="padding-left:20px;">
+                Current date range: {{ data_range1 }}
+            </div>
+            <div class="row1">
+                <div class="map1" style="max-width:1300px;padding-top:20px;margin:auto;">
+                    {{ m1 | safe }}
+                </div>
+            </div>
+            <div class="row1">
+                <div class="col-md-8" style="padding-top:50px;padding-left:50px;">
+                    <form method="POST" id="form 1">
+                        {% csrf_token %}
+                        <p>Select the date for Map 1: <input type="text" id="datepicker1" name="date_range1" ></p>
+                        <button type="submit" name="submit_map1">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="current-date-range2" style="padding-left:20px;">
+                Current date range: {{ data_range2 }}
+            </div>
+            <div class="row2">
+                <div class="map2" style="max-width:1300px;padding-top:20px;margin:auto;">
+                    {{ m2 | safe }}
+                </div>
+            </div>
+            <div class="row2">
+                <div class="col-md-8" style="padding-top:50px;padding-left:50px;">
+                    <form method="POST" id="form2">
+                        {% csrf_token %}
+                        <p>Select the date for Map 2: <input type="text" id="datepicker2" name="date_range2" ></p>
+                        <button type="submit" name="submit_map2">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $( "#datepicker1" ).datepicker({
+        dateFormat: "yy-mm",
+        minDate: new Date(2019, 0, 1), // January 1st, 2019
+        maxDate: new Date(2021, 11, 31) // December 31st, 2021
+      });
+      $( "#datepicker2" ).datepicker({
+        dateFormat: "yy-mm",
+        minDate: new Date(2019, 0, 1), // January 1st, 2019
+        maxDate: new Date(2021, 11, 31) // December 31st, 2021
+      });
+      
+      var date_range1 = "{{data_range1}}";
+      var date_range2 = "{{data_range2}}";
+      
+      // Do something when the date is selected, like updating markers or data
+      $('#form1').on('submit', function() {
+          date_range1 = $('#datepicker1').val();
+      });
+      
+      $('#form2').on('submit', function() {
+          date_range2 = $('#datepicker2').val();
+      });
+</script>
+{% endblock %}
